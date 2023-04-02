@@ -112,7 +112,7 @@ loadTsList()
           <template v-if="col.field === 'createdBy'" #body="slotProps">
             <span class="sidepanel-link" @click="openExtSidePanel(Bitrix24.getUserLink(slotProps.data.createdBy))">{{ users[slotProps.data.createdBy].LAST_NAME }} {{ users[slotProps.data.createdBy].NAME }}</span>
           </template>
-          <template v-if="col.field === 'createdTime'" #body="slotProps">
+          <template v-if="col.field === 'ufCrmPropertyDataSpisanieTs1'" #body="slotProps">
             {{ dateFormat(new Date(slotProps.data.createdTime), 'dd.mm.yyyy H:M') }}
           </template>
         </Column>

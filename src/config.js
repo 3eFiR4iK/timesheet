@@ -11,6 +11,6 @@ export const entityCode = "task_ts"
 export const gridColumns = [
     { field: 'title', header: 'Название' },
     { field: 'createdBy', header: 'Кто создал' },
-    { field: 'ufCrm2PropertyPotrachennoeVremya', header: 'Потраченное время' },
-    { field: 'createdTime', header: 'Дата списания' }
+    { field: 'ufCrmPropertyPotrachennoeVremya', header: 'Потраченное время' },
+    { field: 'ufCrmPropertyDataSpisanieTs1', header: 'Дата списания' }
 ]

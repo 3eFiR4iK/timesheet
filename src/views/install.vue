@@ -10,7 +10,7 @@ import { Bitrix24 } from "@/classes/Bitrix24"
 function installApp() {
   Bitrix24.callMethod('placement.bind', {
     PLACEMENT: 'TASK_VIEW_TAB',
-    HANDLER: Bitrix24.getDomain() + appRoot,
+    HANDLER: 'https://' + Bitrix24.getDomain() + appRoot,
     LANG_ALL: {
       ru: {
         TITLE: "Таймшиты",

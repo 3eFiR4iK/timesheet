@@ -4,12 +4,12 @@ import Install from "@/views/install.vue";
 
 const routes = [
     {
-        path: "/local/applications/timesheet_vue/dist",
+        path: "/local/applications/timesheet/dist",
         name: "index",
         component: Index,
     },
     {
-        path: "/local/applications/timesheet_vue/dist?install=Y",
+        path: "/local/applications/timesheet/dist?install=Y",
         name: "install",
         component: Install,
     },
