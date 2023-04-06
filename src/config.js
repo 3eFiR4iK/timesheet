@@ -6,6 +6,8 @@ export const tsFromUrl = "/crm/type/" + tsListId + "/details/0/"
 
 export const appRoot = "/local/applications/timesheet/dist"
 
+export const taskIdFieldName = 'ufCrm4TaskId'
+
 export const entityCode = "task_ts"
 
 export const gridColumns = [

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {callBatch, callStepBatch, normalizeData} from "./Api";
-import { entityCode } from "@/config";
+import { entityCode, tsListId, taskIdFieldName } from "@/config";
 
 export class Bitrix24 {
     static getDomain() {
@@ -163,16 +163,32 @@ export class Bitrix24 {
 
     static addTs(taskId, tsId) {
         return new Promise( (resolve, reject) => {
-            Bitrix24.callMethod('entity.item.add', {
-                ENTITY: entityCode,
-                ACTIVE: 'Y',
-                NAME: "ТШ для задачи " + taskId,
-                PROPERTY_VALUES: {
-                    taskId: taskId,
-                    tsId: tsId,
-                }
+            Bitrix24.callMethod('tasks.task.get', {
+                taskId: taskId,
+                select: ['ID', 'UF_CRM_TASK']
             }).then(response => {
-                return resolve(response)
+                const crmElems = response.answer.result.task.ufCrmTask;
+                let params = {}
+
+                params[taskIdFieldName] = taskId
+                if (crmElems) {
+                    for (let crmElem of crmElems) {
+                        if (crmElem.indexOf('CO_') === 0) {
+                            params['companyId'] = crmElem.substr(3)
+                            break
+                        }
+                    }
+                }
+
+                Bitrix24.callMethod('crm.item.update', {
+                    entityTypeId: tsListId,
+                    id: tsId,
+                    fields: params
+                }).then(response => {
+                    return resolve(response)
+                })
+            }).catch((response) => {
+                return reject(response)
             })
         })
     }

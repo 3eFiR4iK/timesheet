@@ -1,12 +1,11 @@
 <script setup>
 /* eslint-disable */
 import { ref } from "vue"
-import { tsFromUrl, tsListId, entityCode, gridColumns } from "@/config"
+import { tsFromUrl, tsListId, gridColumns, taskIdFieldName } from "@/config"
 import { Bitrix24 } from "@/classes/Bitrix24"
 import dateFormat from "dateformat"
 import Paginator from 'primevue/paginator'
 
-let needLoadTs = [];
 let users = [];
 let totalRecords = ref()
 let tsList = ref()
@@ -29,37 +28,44 @@ function openSidePanel() {
               page.value = 0
               loadTsList()
               event.slider.close()
+              window.top.BX.SidePanel.Instance.cleanUpClosedSlider(event.slider)
             })
           }
         }
-        console.log("onLoad");
       }
     }
   })
 }
 
 function loadTsList(start = 0) {
-  Bitrix24.callMethod('entity.item.get', {
-    ENTITY: entityCode,
-    SORT: {DATE_CREATE: 'DESC'},
-    FILTER: {
-      '=PROPERTY_taskId': placement.options.taskId
-    },
-    start: start
-  }).then(response => {
-    totalRecords.value = response.answer.total
-    users = []
-    needLoadTs = []
 
-    for (let item of response.answer.result) {
-      users.push(item.CREATED_BY);
-      needLoadTs.push(item.PROPERTY_VALUES.tsId)
+  const filter = {}
+
+  filter[taskIdFieldName] = placement.options.taskId
+
+  Bitrix24.callMethod('crm.item.list', {
+    entityTypeId: tsListId,
+    filter,
+    order: {
+      createdTime: 'DESC'
+    },
+    select: ['*'],
+    start: start
+  }).then(listItems => {
+    totalRecords.value = listItems.answer.total
+    users = []
+
+    if (totalRecords.value <= 0) {
+      return
+    }
+
+    for (let item of listItems.answer.result.items) {
+      users.push(item.createdBy);
     }
 
     users = users.filter(function(item, pos){
       return users.indexOf(item) == pos;
     });
-
     Bitrix24.callMethod('user.get', {
       ID: users,
       ADMIN_MODE: 'True'
@@ -67,19 +73,7 @@ function loadTsList(start = 0) {
       for (let item of response.answer.result) {
         users[item.ID] = item;
       }
-
-      Bitrix24.callMethod('crm.item.list', {
-        entityTypeId: tsListId,
-        filter: {
-          '=id': needLoadTs
-        },
-        order: {
-          createdTime: 'DESC'
-        },
-        select: ['*']
-      }).then(list => {
-        tsList.value = list.answer.result.items
-      })
+      tsList.value = listItems.answer.result.items
     })
   })
 }
